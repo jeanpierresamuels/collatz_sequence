@@ -1,66 +1,87 @@
 #!/usr/bin/python
 
-import memory_profiler
 import sys
+import time
+
 from collatz_exceptions import TooManyArgsError, MaxLimitTooLowError
 
-
 # Holds the current longest length.
-longest_term = {'value': 1, 'length': 1, 'also': []}
+LONGEST_TERM = {'value': 1, 'length': 1}
 # Number of terms in a sequence.
-# count_term_len = 2
+COUNT_TERM_LENGTH = 1
+# Implements type of caching.
+# Not an array, because will delete objects on the way with
+# keys varying.
+CACHING_DICT = {}
 
 
-# @memory_profiler.profile
-def even_or_odd(number):
-    """Determines if a given number is odd or even.
-
-    Return True for even,
-    Return False for odd.
-    """
-    if number % 2:
-        return False
-    return True
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print '%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0)
+        return ret
+    return wrap
 
 
-# @memory_profiler.profile
-def collatz_sequence(number, counter=1):
-    """Applies the appropriate action on given number."""
-    if counter != number == 1:
-        return counter
-    counter += 1
-    if even_or_odd(number):
-        return collatz_sequence(number/2, counter)
-    return collatz_sequence((3 * number) + 1, counter)
+def collatz_sequence(number):
+    """Applies the appropriate action on given number recursively."""
+    global COUNT_TERM_LENGTH, LONGEST_TERM, CACHING_DICT
+
+    if number in CACHING_DICT:
+        COUNT_TERM_LENGTH += CACHING_DICT[number]
+        return
+
+    if COUNT_TERM_LENGTH != number == 1:
+        # output += '{}'.format(number)
+        return
+    COUNT_TERM_LENGTH += 1
+    # output += '{} -> '.format(number)
+    if not number % 2:
+        return collatz_sequence(number/2)
+    return collatz_sequence((3 * number) + 1)
+
+
+def update_caching(number):
+    """Updates the Caching dictionary."""
+    global CACHING_DICT, COUNT_TERM_LENGTH
+
+    CACHING_DICT[number] = COUNT_TERM_LENGTH
 
 
 def update_longest_term(number):
     """Updates data for the longest term."""
-    global count_term_len, longest_term
+    global COUNT_TERM_LENGTH, LONGEST_TERM
 
-    if count_term_len > longest_term['length']:
-        longest_term['value'] = number
-        longest_term['length'] = count_term_len
-        longest_term['also'] = []
-    elif count_term_len == longest_term['length']:
-        longest_term['also'].append(number)
+    if COUNT_TERM_LENGTH > LONGEST_TERM['length']:
+        LONGEST_TERM['value'] = number
+        LONGEST_TERM['length'] = COUNT_TERM_LENGTH
+
+
+@timing
+def start_collatz(limit_number):
+    """Starting point for Collatz process."""
+    global COUNT_TERM_LENGTH
+
+    for x_number in range(1, limit_number):
+        # Need to reset COUNT_TERM_LENGTH to 1 for each loop
+        COUNT_TERM_LENGTH = 1
+        # output = ''
+        collatz_sequence(x_number)
+        update_longest_term(x_number)
+        update_caching(x_number)
 
 
 if __name__ == "__main__":
+
     if len(sys.argv[1:]) > 1:
         raise TooManyArgsError()
 
     limit_number = int(sys.argv[1:][0])
-    if limit_number < 1:
+    if limit_number < 2:
         raise MaxLimitTooLowError()
-    x_number = limit_number
-    for x_number in range(1, limit_number+1):
-        count_term_len = collatz_sequence(x_number)
-        if count_term_len > longest_term['length']:
-            longest_term['value'] = x_number
-            longest_term['length'] = count_term_len
-            longest_term['also'] = []
-        elif count_term_len == longest_term['length']:
-            longest_term['also'].append(x_number)
 
-    print(longest_term)
+    start_collatz(limit_number)
+
+    print(LONGEST_TERM)
