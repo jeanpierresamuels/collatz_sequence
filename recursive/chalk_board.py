@@ -9,10 +9,11 @@ from collatz_exceptions import TooManyArgsError, MaxLimitTooLowError
 LONGEST_TERM = {'value': 1, 'length': 1}
 # Number of terms in a sequence.
 COUNT_TERM_LENGTH = 1
-# Implements type of caching.
 # Not an array, because will delete objects on the way with
 # keys varying.
 CACHING_DICT = {}
+# Max Size of dictionary
+MAX_CACHE_SIZE = 250
 
 
 def timing(f):
@@ -25,6 +26,7 @@ def timing(f):
     return wrap
 
 
+# @memory_profiler.profile
 def collatz_sequence(number):
     """Applies the appropriate action on given number recursively."""
     global COUNT_TERM_LENGTH, LONGEST_TERM, CACHING_DICT
@@ -43,10 +45,29 @@ def collatz_sequence(number):
     return collatz_sequence((3 * number) + 1)
 
 
+def manage_cache_variables():
+    """Maintain the Cache variable a certain
+    size to prevent to much memory usage."""
+    global CACHING_DICT, MAX_CACHE_SIZE
+
+    # Check if Max Cache Size reached.
+    if len(CACHING_DICT) == MAX_CACHE_SIZE:
+        # Get list of values in the dictionary cache.
+        list_values = CACHING_DICT.values()
+        # Get the smallest count term.
+        least_count = min(list_values)
+        # Get the index to determine the key in the dictionary.
+        i = list_values.index(least_count)
+        key_to_delete = CACHING_DICT.keys()[i]
+        # Delete the key
+        del CACHING_DICT[key_to_delete]
+
+
 def update_caching(number):
     """Updates the Caching dictionary."""
-    global CACHING_DICT, COUNT_TERM_LENGTH
+    global CACHING_DICT, COUNT_TERM_LENGTH, MAX_CACHE_SIZE
 
+    # manage_cache_variables()
     CACHING_DICT[number] = COUNT_TERM_LENGTH
 
 
