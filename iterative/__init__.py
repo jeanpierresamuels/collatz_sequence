@@ -1,1 +1,0 @@
-"""Collatz Sequence iterative method."""

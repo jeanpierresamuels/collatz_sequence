@@ -18,5 +18,11 @@ class MaxLimitTooLowError(ExceptionTemplate):
     def __init__(self):
         message = \
             "The given limit is too low. " \
-            "Please input a number higher then 0."
+            "Please input a number higher then 1."
+        super(ExceptionTemplate, self).__init__(message)
+
+
+class NotIntegerError(ExceptionTemplate):
+    def __init__(self):
+        message = "Error encountered.Please input an integer."
         super(ExceptionTemplate, self).__init__(message)
