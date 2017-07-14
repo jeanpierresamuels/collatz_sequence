@@ -14,3 +14,6 @@ After program finishes, The time it took plus the longest term should be printed
     > start_collatz function took 0.03290 ms
     > Longest term are:
     > {'term': 1, 'length': 4}
+
+To run tests:
+    python tests.py
