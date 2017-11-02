@@ -24,9 +24,7 @@ def collatz_sequence(number):
         return
 
     s_.COUNT_TERM_LENGTH += 1
-    if not number % 2:
-        return collatz_sequence(number/2)
-    return collatz_sequence((3 * number) + 1)
+    return collatz_sequence(number / 2) if not number % 2 else collatz_sequence((3 * number) + 1)
 
 
 @timing

@@ -12,9 +12,7 @@ from validation import (
 
 def collatz_sequence(number):
     """Applies the appropriate action on given number."""
-    if even_or_odd(number):
-        return number/2
-    return (3 * number) + 1
+    return number/2 if even_or_odd(number) else (3 * number) + 1
 
 
 def loop_collatz(number):
