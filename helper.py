@@ -21,9 +21,7 @@ def even_or_odd(number):
     Return True for even,
     Return False for odd.
     """
-    if number % 2:
-        return False
-    return True
+    return False if number % 2 else True
 
 
 def update_longest_term(number):
